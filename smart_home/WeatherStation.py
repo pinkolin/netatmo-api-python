@@ -30,8 +30,8 @@ class WeatherStationData:
         try:
             self.rawData = resp["body"].get("devices")
         except KeyError:
-            LOG.error("No <body> in response %s", resp)
-            raise NoDevice("No <body> in response %s" % resp)
+            LOG.debug("No <body> in response %s", resp)
+            raise NoDevice("No weather station data returned by Netatmo server")
         if not self.rawData:
             raise NoDevice("No weather station available")
         self.stations = {d["_id"]: d for d in self.rawData}
