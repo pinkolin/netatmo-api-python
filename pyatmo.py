@@ -16,7 +16,7 @@ from smart_home import _BASE_URL, NoDevice, postRequest
 from smart_home.Camera import CameraData
 from smart_home.HomeCoach import HomeCoachData
 from smart_home.PublicData import PublicData
-from smart_home.Thermostat import HomeData, HomeStatus, ThermostatData
+from smart_home.Thermostat import HomeData, HomeStatus
 from smart_home.WeatherStation import DeviceList, WeatherStationData
 
 LOG = logging.getLogger(__name__)
@@ -61,7 +61,11 @@ class ClientAuth:
         resp = postRequest(_AUTH_REQ, postParams)
         self._clientId = clientId
         self._clientSecret = clientSecret
-        self._accessToken = resp["access_token"]
+        try:
+            self._accessToken = resp["access_token"]
+        except (KeyError):
+            LOG.error("Netatmo API returned %s", resp["error"])
+            raise NoDevice("Authentication against Netatmo API failed")
         self.refreshToken = resp["refresh_token"]
         self._scope = resp["scope"]
         self.expiration = int(resp["expire_in"] + time.time() - 1800)
